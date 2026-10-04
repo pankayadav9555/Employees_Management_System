@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-// =========================
-// BACKEND API URL
-// =========================
+// ==========================================
+// PRODUCTION BACKEND API
+// ==========================================
 const API_URL =
   "https://employees-management-system-1-3oal.onrender.com/api/employees";
 
@@ -19,16 +19,14 @@ function App() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Edit mode
   const [editId, setEditId] = useState(null);
 
-  // Search and filter
   const [search, setSearch] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("");
 
-  // =========================
+  // ==========================================
   // GET ALL EMPLOYEES
-  // =========================
+  // ==========================================
   const fetchEmployees = async () => {
     try {
       setLoading(true);
@@ -37,14 +35,18 @@ function App() {
       const response = await fetch(API_URL);
 
       if (!response.ok) {
-        throw new Error("Failed to fetch employees");
+        throw new Error(`HTTP Error: ${response.status}`);
       }
 
       const data = await response.json();
+
       setEmployees(data);
     } catch (error) {
       console.error("GET Error:", error);
-      setError("Backend se employees load nahi ho pa rahe hain.");
+
+      setError(
+        "Backend se employees load nahi ho pa rahe hain. Please backend check karein."
+      );
     } finally {
       setLoading(false);
     }
@@ -54,9 +56,9 @@ function App() {
     fetchEmployees();
   }, []);
 
-  // =========================
+  // ==========================================
   // INPUT CHANGE
-  // =========================
+  // ==========================================
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -66,9 +68,9 @@ function App() {
     });
   };
 
-  // =========================
+  // ==========================================
   // ADD / UPDATE EMPLOYEE
-  // =========================
+  // ==========================================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -76,21 +78,25 @@ function App() {
       setError("");
       setSuccess("");
 
+      const employeeData = {
+        ...employee,
+        salary: Number(employee.salary),
+      };
+
+      // ======================================
       // UPDATE
+      // ======================================
       if (editId !== null) {
         const response = await fetch(`${API_URL}/${editId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...employee,
-            salary: Number(employee.salary),
-          }),
+          body: JSON.stringify(employeeData),
         });
 
         if (!response.ok) {
-          throw new Error("Failed to update employee");
+          throw new Error(`HTTP Error: ${response.status}`);
         }
 
         await response.json();
@@ -99,21 +105,20 @@ function App() {
         setEditId(null);
       }
 
+      // ======================================
       // ADD
+      // ======================================
       else {
         const response = await fetch(API_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...employee,
-            salary: Number(employee.salary),
-          }),
+          body: JSON.stringify(employeeData),
         });
 
         if (!response.ok) {
-          throw new Error("Failed to add employee");
+          throw new Error(`HTTP Error: ${response.status}`);
         }
 
         await response.json();
@@ -129,7 +134,7 @@ function App() {
         salary: "",
       });
 
-      fetchEmployees();
+      await fetchEmployees();
 
       setTimeout(() => {
         setSuccess("");
@@ -137,25 +142,29 @@ function App() {
     } catch (error) {
       console.error("Submit Error:", error);
 
-      setError(
-        editId !== null
-          ? "Employee update nahi ho paya."
-          : "Employee add nahi ho paya."
-      );
+      if (editId !== null) {
+        setError(
+          "Employee update nahi ho paya. Backend/CORS configuration check karein."
+        );
+      } else {
+        setError(
+          "Employee add nahi ho paya. Backend/CORS configuration check karein."
+        );
+      }
     }
   };
 
-  // =========================
+  // ==========================================
   // EDIT EMPLOYEE
-  // =========================
+  // ==========================================
   const handleEdit = (emp) => {
     setEditId(emp.id);
 
     setEmployee({
-      name: emp.name,
-      email: emp.email,
-      department: emp.department,
-      salary: emp.salary,
+      name: emp.name || "",
+      email: emp.email || "",
+      department: emp.department || "",
+      salary: emp.salary || "",
     });
 
     setError("");
@@ -167,9 +176,9 @@ function App() {
     });
   };
 
-  // =========================
+  // ==========================================
   // CANCEL EDIT
-  // =========================
+  // ==========================================
   const handleCancelEdit = () => {
     setEditId(null);
 
@@ -184,9 +193,9 @@ function App() {
     setSuccess("");
   };
 
-  // =========================
+  // ==========================================
   // DELETE EMPLOYEE
-  // =========================
+  // ==========================================
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this employee?"
@@ -205,7 +214,7 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete employee");
+        throw new Error(`HTTP Error: ${response.status}`);
       }
 
       setSuccess("Employee deleted successfully!");
@@ -214,20 +223,23 @@ function App() {
         handleCancelEdit();
       }
 
-      fetchEmployees();
+      await fetchEmployees();
 
       setTimeout(() => {
         setSuccess("");
       }, 3000);
     } catch (error) {
       console.error("DELETE Error:", error);
-      setError("Employee delete nahi ho paya.");
+
+      setError(
+        "Employee delete nahi ho paya. Backend/CORS configuration check karein."
+      );
     }
   };
 
-  // =========================
+  // ==========================================
   // DEPARTMENTS
-  // =========================
+  // ==========================================
   const departments = [
     ...new Set(
       employees
@@ -236,10 +248,9 @@ function App() {
     ),
   ];
 
-  // =========================
+  // ==========================================
   // DASHBOARD CALCULATIONS
-  // =========================
-
+  // ==========================================
   const totalEmployees = employees.length;
 
   const totalDepartments = departments.length;
@@ -263,16 +274,16 @@ function App() {
         )
       : 0;
 
-  // =========================
+  // ==========================================
   // SEARCH + FILTER
-  // =========================
+  // ==========================================
   const filteredEmployees = employees.filter((emp) => {
     const searchText = search.toLowerCase();
 
     const matchesSearch =
-      emp.name.toLowerCase().includes(searchText) ||
-      emp.email.toLowerCase().includes(searchText) ||
-      emp.department.toLowerCase().includes(searchText);
+      (emp.name || "").toLowerCase().includes(searchText) ||
+      (emp.email || "").toLowerCase().includes(searchText) ||
+      (emp.department || "").toLowerCase().includes(searchText);
 
     const matchesDepartment =
       departmentFilter === "" ||
@@ -281,9 +292,9 @@ function App() {
     return matchesSearch && matchesDepartment;
   });
 
-  // =========================
+  // ==========================================
   // CLEAR FILTERS
-  // =========================
+  // ==========================================
   const clearFilters = () => {
     setSearch("");
     setDepartmentFilter("");
@@ -297,10 +308,7 @@ function App() {
         minHeight: "100vh",
       }}
     >
-      {/* =========================
-          NAVBAR
-      ========================= */}
-
+      {/* NAVBAR */}
       <nav className="navbar navbar-dark bg-primary shadow">
         <div className="container">
           <span className="navbar-brand fw-bold">
@@ -311,10 +319,7 @@ function App() {
 
       <div className="container py-5">
 
-        {/* =========================
-            HEADING
-        ========================= */}
-
+        {/* HEADING */}
         <div className="text-center mb-5">
           <h1 className="fw-bold text-primary">
             Employee Management System
@@ -325,39 +330,28 @@ function App() {
           </p>
         </div>
 
-        {/* =========================
-            SUCCESS MESSAGE
-        ========================= */}
-
+        {/* SUCCESS */}
         {success && (
           <div className="alert alert-success shadow-sm">
             ✅ {success}
           </div>
         )}
 
-        {/* =========================
-            ERROR MESSAGE
-        ========================= */}
-
+        {/* ERROR */}
         {error && (
           <div className="alert alert-danger shadow-sm">
             ❌ {error}
           </div>
         )}
 
-        {/* =========================
-            DASHBOARD
-        ========================= */}
-
+        {/* DASHBOARD */}
         <div className="row g-4 mb-5">
 
           {/* TOTAL EMPLOYEES */}
-
           <div className="col-md-6 col-lg-3">
             <div className="card border-0 shadow h-100">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
-
                   <div>
                     <p className="text-muted mb-1">
                       Total Employees
@@ -378,19 +372,16 @@ function App() {
                   >
                     👥
                   </div>
-
                 </div>
               </div>
             </div>
           </div>
 
           {/* TOTAL DEPARTMENTS */}
-
           <div className="col-md-6 col-lg-3">
             <div className="card border-0 shadow h-100">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
-
                   <div>
                     <p className="text-muted mb-1">
                       Departments
@@ -411,19 +402,16 @@ function App() {
                   >
                     🏢
                   </div>
-
                 </div>
               </div>
             </div>
           </div>
 
           {/* AVERAGE SALARY */}
-
           <div className="col-md-6 col-lg-3">
             <div className="card border-0 shadow h-100">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
-
                   <div>
                     <p className="text-muted mb-1">
                       Average Salary
@@ -447,19 +435,16 @@ function App() {
                   >
                     💰
                   </div>
-
                 </div>
               </div>
             </div>
           </div>
 
           {/* HIGHEST SALARY */}
-
           <div className="col-md-6 col-lg-3">
             <div className="card border-0 shadow h-100">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
-
                   <div>
                     <p className="text-muted mb-1">
                       Highest Salary
@@ -483,18 +468,13 @@ function App() {
                   >
                     💵
                   </div>
-
                 </div>
               </div>
             </div>
           </div>
-
         </div>
 
-        {/* =========================
-            ADD / EDIT FORM
-        ========================= */}
-
+        {/* ADD / EDIT FORM */}
         <div className="card shadow border-0 mb-5">
 
           <div
@@ -518,9 +498,7 @@ function App() {
               <div className="row g-3">
 
                 {/* NAME */}
-
                 <div className="col-md-6">
-
                   <label className="form-label fw-semibold">
                     Name
                   </label>
@@ -534,13 +512,10 @@ function App() {
                     onChange={handleChange}
                     required
                   />
-
                 </div>
 
                 {/* EMAIL */}
-
                 <div className="col-md-6">
-
                   <label className="form-label fw-semibold">
                     Email
                   </label>
@@ -554,13 +529,10 @@ function App() {
                     onChange={handleChange}
                     required
                   />
-
                 </div>
 
                 {/* DEPARTMENT */}
-
                 <div className="col-md-6">
-
                   <label className="form-label fw-semibold">
                     Department
                   </label>
@@ -574,13 +546,10 @@ function App() {
                     onChange={handleChange}
                     required
                   />
-
                 </div>
 
                 {/* SALARY */}
-
                 <div className="col-md-6">
-
                   <label className="form-label fw-semibold">
                     Salary
                   </label>
@@ -594,13 +563,10 @@ function App() {
                     onChange={handleChange}
                     required
                   />
-
                 </div>
-
               </div>
 
               {/* BUTTONS */}
-
               <div className="mt-4 d-flex gap-2">
 
                 <button
@@ -625,18 +591,12 @@ function App() {
                     ❌ Cancel
                   </button>
                 )}
-
               </div>
-
             </form>
-
           </div>
         </div>
 
-        {/* =========================
-            EMPLOYEE LIST
-        ========================= */}
-
+        {/* EMPLOYEE LIST */}
         <div className="card shadow border-0">
 
           <div className="card-header bg-dark text-white d-flex justify-content-between align-items-center">
@@ -654,11 +614,9 @@ function App() {
           <div className="card-body">
 
             {/* SEARCH + FILTER */}
-
             <div className="row g-3 mb-4">
 
               <div className="col-md-7">
-
                 <label className="form-label fw-semibold">
                   🔍 Search Employee
                 </label>
@@ -672,11 +630,9 @@ function App() {
                     setSearch(e.target.value)
                   }
                 />
-
               </div>
 
               <div className="col-md-5">
-
                 <label className="form-label fw-semibold">
                   🏢 Filter by Department
                 </label>
@@ -690,7 +646,6 @@ function App() {
                     )
                   }
                 >
-
                   <option value="">
                     All Departments
                   </option>
@@ -703,15 +658,11 @@ function App() {
                       {department}
                     </option>
                   ))}
-
                 </select>
-
               </div>
-
             </div>
 
             {/* CLEAR FILTER */}
-
             {(search || departmentFilter) && (
               <button
                 className="btn btn-outline-secondary btn-sm mb-4"
@@ -722,7 +673,6 @@ function App() {
             )}
 
             {/* LOADING */}
-
             {loading && (
               <div className="text-center py-4">
 
@@ -734,12 +684,10 @@ function App() {
                 <p className="mt-2 text-muted">
                   Loading employees...
                 </p>
-
               </div>
             )}
 
             {/* NO EMPLOYEES */}
-
             {!loading &&
               !error &&
               employees.length === 0 && (
@@ -757,7 +705,6 @@ function App() {
               )}
 
             {/* NO SEARCH RESULT */}
-
             {!loading &&
               employees.length > 0 &&
               filteredEmployees.length === 0 && (
@@ -778,7 +725,6 @@ function App() {
               )}
 
             {/* TABLE */}
-
             {!loading &&
               filteredEmployees.length > 0 && (
                 <div className="table-responsive">
@@ -858,7 +804,6 @@ function App() {
                           </td>
 
                         </tr>
-
                       ))}
 
                     </tbody>
@@ -867,22 +812,16 @@ function App() {
 
                 </div>
               )}
-
           </div>
         </div>
-
       </div>
 
       {/* FOOTER */}
-
       <footer className="bg-dark text-white text-center py-3 mt-5">
-
         <small>
           Employee Management System | React + Spring Boot + MySQL
         </small>
-
       </footer>
-
     </div>
   );
 }
