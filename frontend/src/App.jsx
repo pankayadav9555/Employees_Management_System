@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 
+// =========================
+// BACKEND API URL
+// =========================
+const API_URL =
+  "https://employees-management-system-1-3oal.onrender.com/api/employees";
+
 function App() {
   const [employee, setEmployee] = useState({
     name: "",
@@ -28,9 +34,7 @@ function App() {
       setLoading(true);
       setError("");
 
-      const response = await fetch(
-        "http://localhost:8080/api/employees"
-      );
+      const response = await fetch(API_URL);
 
       if (!response.ok) {
         throw new Error("Failed to fetch employees");
@@ -74,19 +78,16 @@ function App() {
 
       // UPDATE
       if (editId !== null) {
-        const response = await fetch(
-          `http://localhost:8080/api/employees/${editId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              ...employee,
-              salary: Number(employee.salary),
-            }),
-          }
-        );
+        const response = await fetch(`${API_URL}/${editId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...employee,
+            salary: Number(employee.salary),
+          }),
+        });
 
         if (!response.ok) {
           throw new Error("Failed to update employee");
@@ -100,19 +101,16 @@ function App() {
 
       // ADD
       else {
-        const response = await fetch(
-          "http://localhost:8080/api/employees",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              ...employee,
-              salary: Number(employee.salary),
-            }),
-          }
-        );
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...employee,
+            salary: Number(employee.salary),
+          }),
+        });
 
         if (!response.ok) {
           throw new Error("Failed to add employee");
@@ -202,12 +200,9 @@ function App() {
       setError("");
       setSuccess("");
 
-      const response = await fetch(
-        `http://localhost:8080/api/employees/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to delete employee");
@@ -362,6 +357,7 @@ function App() {
             <div className="card border-0 shadow h-100">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
+
                   <div>
                     <p className="text-muted mb-1">
                       Total Employees
@@ -382,6 +378,7 @@ function App() {
                   >
                     👥
                   </div>
+
                 </div>
               </div>
             </div>
@@ -393,6 +390,7 @@ function App() {
             <div className="card border-0 shadow h-100">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
+
                   <div>
                     <p className="text-muted mb-1">
                       Departments
@@ -413,6 +411,7 @@ function App() {
                   >
                     🏢
                   </div>
+
                 </div>
               </div>
             </div>
@@ -424,6 +423,7 @@ function App() {
             <div className="card border-0 shadow h-100">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
+
                   <div>
                     <p className="text-muted mb-1">
                       Average Salary
@@ -447,6 +447,7 @@ function App() {
                   >
                     💰
                   </div>
+
                 </div>
               </div>
             </div>
@@ -458,6 +459,7 @@ function App() {
             <div className="card border-0 shadow h-100">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center">
+
                   <div>
                     <p className="text-muted mb-1">
                       Highest Salary
@@ -481,6 +483,7 @@ function App() {
                   >
                     💵
                   </div>
+
                 </div>
               </div>
             </div>
