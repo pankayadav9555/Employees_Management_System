@@ -99,3 +99,37 @@ The application allows users to efficiently manage employee records with complet
                       │
                       ▼
                    Aiven
+```
+
+---
+
+## 📸 Application Screenshots
+
+### 🏠 Dashboard
+
+![Employee Management System Dashboard](screenshots/dashboard.png)
+
+### ➕ Add Employee
+
+![Add Employee](screenshots/add-employee.png)
+
+### ✏️ Update Employee
+
+![Update Employee](screenshots/update-employee.png)
+
+### 🔍 Search and Department Filter
+
+![Search and Department Filter](screenshots/search-filter.png)
+
+### 🗑️ Delete Employee
+
+![Delete Employee](screenshots/delete-employee.png)
+
+---
+
+## 👨‍💻 Developer
+
+**Pankaj Yadav**
+
+B.Tech Computer Science Engineering  
+Galgotias University
