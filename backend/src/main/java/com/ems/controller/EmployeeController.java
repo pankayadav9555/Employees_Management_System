@@ -34,9 +34,6 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    // =========================
-    // CREATE EMPLOYEE
-    // =========================
     @PostMapping
     public ResponseEntity<Employee> createEmployee(
             @RequestBody Employee employee) {
@@ -47,9 +44,6 @@ public class EmployeeController {
         return ResponseEntity.ok(savedEmployee);
     }
 
-    // =========================
-    // GET ALL EMPLOYEES
-    // =========================
     @GetMapping
     public ResponseEntity<List<Employee>> getAllEmployees() {
 
@@ -59,9 +53,6 @@ public class EmployeeController {
         return ResponseEntity.ok(employees);
     }
 
-    // =========================
-    // GET EMPLOYEE BY ID
-    // =========================
     @GetMapping("/{id}")
     public ResponseEntity<Employee> getEmployeeById(
             @PathVariable Long id) {
@@ -71,9 +62,6 @@ public class EmployeeController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // =========================
-    // UPDATE EMPLOYEE
-    // =========================
     @PutMapping("/{id}")
     public ResponseEntity<Employee> updateEmployee(
             @PathVariable Long id,
@@ -85,9 +73,6 @@ public class EmployeeController {
         return ResponseEntity.ok(updatedEmployee);
     }
 
-    // =========================
-    // DELETE EMPLOYEE
-    // =========================
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(
             @PathVariable Long id) {

@@ -10,15 +10,15 @@ The application allows users to efficiently manage employee records with complet
 
 ### Frontend
 
-https://employees-management-system-fronten-ecru.vercel.app/
+[https://employees-management-system-fronten-ecru.vercel.app/](https://employees-management-system-fronten-ecru.vercel.app/)
 
 ### Backend API
 
-https://employees-management-system-1-3oal.onrender.com/
+[https://employees-management-system-1-3oal.onrender.com/](https://employees-management-system-1-3oal.onrender.com/)
 
 ### Source Code
 
-https://github.com/pankayadav9555/Employees_Management_System
+[https://github.com/pankayadav9555/Employees_Management_System](https://github.com/pankayadav9555/Employees_Management_System)
 
 ---
 
@@ -92,10 +92,10 @@ https://github.com/pankayadav9555/Employees_Management_System
             Spring Boot REST API
                       │
                       ▼
-                   Render
+                  Render
                       │
                       ▼
-                MySQL Database
+              MySQL Database
                       │
                       ▼
                    Aiven
