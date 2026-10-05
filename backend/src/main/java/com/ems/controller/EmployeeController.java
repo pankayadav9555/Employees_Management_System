@@ -22,6 +22,7 @@ import com.ems.service.EmployeeService;
         origins = {
             "http://localhost:5173",
             "http://localhost:5174",
+            "http://localhost:3000",
             "https://employees-management-system-fronten-ecru.vercel.app"
         }
 )
@@ -37,16 +38,25 @@ public class EmployeeController {
     // CREATE EMPLOYEE
     // =========================
     @PostMapping
-    public Employee createEmployee(@RequestBody Employee employee) {
-        return employeeService.createEmployee(employee);
+    public ResponseEntity<Employee> createEmployee(
+            @RequestBody Employee employee) {
+
+        Employee savedEmployee
+                = employeeService.createEmployee(employee);
+
+        return ResponseEntity.ok(savedEmployee);
     }
 
     // =========================
     // GET ALL EMPLOYEES
     // =========================
     @GetMapping
-    public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+
+        List<Employee> employees
+                = employeeService.getAllEmployees();
+
+        return ResponseEntity.ok(employees);
     }
 
     // =========================
@@ -65,11 +75,14 @@ public class EmployeeController {
     // UPDATE EMPLOYEE
     // =========================
     @PutMapping("/{id}")
-    public Employee updateEmployee(
+    public ResponseEntity<Employee> updateEmployee(
             @PathVariable Long id,
             @RequestBody Employee employee) {
 
-        return employeeService.updateEmployee(id, employee);
+        Employee updatedEmployee
+                = employeeService.updateEmployee(id, employee);
+
+        return ResponseEntity.ok(updatedEmployee);
     }
 
     // =========================

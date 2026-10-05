@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-// ==========================================
-// PRODUCTION BACKEND API
-// ==========================================
+// =========================
+// BACKEND API URL
+// =========================
 const API_URL =
   "https://employees-management-system-1-3oal.onrender.com/api/employees";
 
@@ -19,14 +19,16 @@ function App() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Edit mode
   const [editId, setEditId] = useState(null);
 
+  // Search and filter
   const [search, setSearch] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("");
 
-  // ==========================================
+  // =========================
   // GET ALL EMPLOYEES
-  // ==========================================
+  // =========================
   const fetchEmployees = async () => {
     try {
       setLoading(true);
@@ -35,7 +37,7 @@ function App() {
       const response = await fetch(API_URL);
 
       if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status}`);
+        throw new Error("Failed to fetch employees");
       }
 
       const data = await response.json();
@@ -45,20 +47,23 @@ function App() {
       console.error("GET Error:", error);
 
       setError(
-        "Backend se employees load nahi ho pa rahe hain. Please backend check karein."
+        "Backend se employees load nahi ho pa rahe hain."
       );
     } finally {
       setLoading(false);
     }
   };
 
+  // =========================
+  // LOAD EMPLOYEES
+  // =========================
   useEffect(() => {
     fetchEmployees();
   }, []);
 
-  // ==========================================
+  // =========================
   // INPUT CHANGE
-  // ==========================================
+  // =========================
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -68,9 +73,9 @@ function App() {
     });
   };
 
-  // ==========================================
+  // =========================
   // ADD / UPDATE EMPLOYEE
-  // ==========================================
+  // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -83,31 +88,37 @@ function App() {
         salary: Number(employee.salary),
       };
 
-      // ======================================
+      // =========================
       // UPDATE
-      // ======================================
+      // =========================
       if (editId !== null) {
-        const response = await fetch(`${API_URL}/${editId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(employeeData),
-        });
+        const response = await fetch(
+          `${API_URL}/${editId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(employeeData),
+          }
+        );
 
         if (!response.ok) {
-          throw new Error(`HTTP Error: ${response.status}`);
+          throw new Error("Failed to update employee");
         }
 
         await response.json();
 
-        setSuccess("Employee updated successfully!");
+        setSuccess(
+          "Employee updated successfully!"
+        );
+
         setEditId(null);
       }
 
-      // ======================================
+      // =========================
       // ADD
-      // ======================================
+      // =========================
       else {
         const response = await fetch(API_URL, {
           method: "POST",
@@ -118,12 +129,14 @@ function App() {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP Error: ${response.status}`);
+          throw new Error("Failed to add employee");
         }
 
         await response.json();
 
-        setSuccess("Employee added successfully!");
+        setSuccess(
+          "Employee added successfully!"
+        );
       }
 
       // Clear form
@@ -134,6 +147,7 @@ function App() {
         salary: "",
       });
 
+      // Refresh employee list
       await fetchEmployees();
 
       setTimeout(() => {
@@ -142,29 +156,25 @@ function App() {
     } catch (error) {
       console.error("Submit Error:", error);
 
-      if (editId !== null) {
-        setError(
-          "Employee update nahi ho paya. Backend/CORS configuration check karein."
-        );
-      } else {
-        setError(
-          "Employee add nahi ho paya. Backend/CORS configuration check karein."
-        );
-      }
+      setError(
+        editId !== null
+          ? "Employee update nahi ho paya."
+          : "Employee add nahi ho paya."
+      );
     }
   };
 
-  // ==========================================
+  // =========================
   // EDIT EMPLOYEE
-  // ==========================================
+  // =========================
   const handleEdit = (emp) => {
     setEditId(emp.id);
 
     setEmployee({
-      name: emp.name || "",
-      email: emp.email || "",
-      department: emp.department || "",
-      salary: emp.salary || "",
+      name: emp.name,
+      email: emp.email,
+      department: emp.department,
+      salary: emp.salary,
     });
 
     setError("");
@@ -176,9 +186,9 @@ function App() {
     });
   };
 
-  // ==========================================
+  // =========================
   // CANCEL EDIT
-  // ==========================================
+  // =========================
   const handleCancelEdit = () => {
     setEditId(null);
 
@@ -193,9 +203,9 @@ function App() {
     setSuccess("");
   };
 
-  // ==========================================
+  // =========================
   // DELETE EMPLOYEE
-  // ==========================================
+  // =========================
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this employee?"
@@ -209,15 +219,20 @@ function App() {
       setError("");
       setSuccess("");
 
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${API_URL}/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status}`);
+        throw new Error("Failed to delete employee");
       }
 
-      setSuccess("Employee deleted successfully!");
+      setSuccess(
+        "Employee deleted successfully!"
+      );
 
       if (editId === id) {
         handleCancelEdit();
@@ -232,14 +247,14 @@ function App() {
       console.error("DELETE Error:", error);
 
       setError(
-        "Employee delete nahi ho paya. Backend/CORS configuration check karein."
+        "Employee delete nahi ho paya."
       );
     }
   };
 
-  // ==========================================
+  // =========================
   // DEPARTMENTS
-  // ==========================================
+  // =========================
   const departments = [
     ...new Set(
       employees
@@ -248,15 +263,17 @@ function App() {
     ),
   ];
 
-  // ==========================================
+  // =========================
   // DASHBOARD CALCULATIONS
-  // ==========================================
+  // =========================
+
   const totalEmployees = employees.length;
 
   const totalDepartments = departments.length;
 
   const totalSalary = employees.reduce(
-    (total, emp) => total + Number(emp.salary || 0),
+    (total, emp) =>
+      total + Number(emp.salary || 0),
     0
   );
 
@@ -274,27 +291,40 @@ function App() {
         )
       : 0;
 
-  // ==========================================
+  // =========================
   // SEARCH + FILTER
-  // ==========================================
-  const filteredEmployees = employees.filter((emp) => {
-    const searchText = search.toLowerCase();
+  // =========================
+  const filteredEmployees = employees.filter(
+    (emp) => {
+      const searchText =
+        search.toLowerCase();
 
-    const matchesSearch =
-      (emp.name || "").toLowerCase().includes(searchText) ||
-      (emp.email || "").toLowerCase().includes(searchText) ||
-      (emp.department || "").toLowerCase().includes(searchText);
+      const matchesSearch =
+        emp.name
+          .toLowerCase()
+          .includes(searchText) ||
+        emp.email
+          .toLowerCase()
+          .includes(searchText) ||
+        emp.department
+          .toLowerCase()
+          .includes(searchText);
 
-    const matchesDepartment =
-      departmentFilter === "" ||
-      emp.department === departmentFilter;
+      const matchesDepartment =
+        departmentFilter === "" ||
+        emp.department ===
+          departmentFilter;
 
-    return matchesSearch && matchesDepartment;
-  });
+      return (
+        matchesSearch &&
+        matchesDepartment
+      );
+    }
+  );
 
-  // ==========================================
+  // =========================
   // CLEAR FILTERS
-  // ==========================================
+  // =========================
   const clearFilters = () => {
     setSearch("");
     setDepartmentFilter("");
@@ -308,7 +338,10 @@ function App() {
         minHeight: "100vh",
       }}
     >
-      {/* NAVBAR */}
+      {/* =========================
+          NAVBAR
+      ========================= */}
+
       <nav className="navbar navbar-dark bg-primary shadow">
         <div className="container">
           <span className="navbar-brand fw-bold">
@@ -319,7 +352,10 @@ function App() {
 
       <div className="container py-5">
 
-        {/* HEADING */}
+        {/* =========================
+            HEADING
+        ========================= */}
+
         <div className="text-center mb-5">
           <h1 className="fw-bold text-primary">
             Employee Management System
@@ -330,28 +366,40 @@ function App() {
           </p>
         </div>
 
-        {/* SUCCESS */}
+        {/* =========================
+            SUCCESS MESSAGE
+        ========================= */}
+
         {success && (
           <div className="alert alert-success shadow-sm">
             ✅ {success}
           </div>
         )}
 
-        {/* ERROR */}
+        {/* =========================
+            ERROR MESSAGE
+        ========================= */}
+
         {error && (
           <div className="alert alert-danger shadow-sm">
             ❌ {error}
           </div>
         )}
 
-        {/* DASHBOARD */}
+        {/* =========================
+            DASHBOARD
+        ========================= */}
+
         <div className="row g-4 mb-5">
 
           {/* TOTAL EMPLOYEES */}
+
           <div className="col-md-6 col-lg-3">
             <div className="card border-0 shadow h-100">
               <div className="card-body">
+
                 <div className="d-flex justify-content-between align-items-center">
+
                   <div>
                     <p className="text-muted mb-1">
                       Total Employees
@@ -372,16 +420,21 @@ function App() {
                   >
                     👥
                   </div>
+
                 </div>
+
               </div>
             </div>
           </div>
 
           {/* TOTAL DEPARTMENTS */}
+
           <div className="col-md-6 col-lg-3">
             <div className="card border-0 shadow h-100">
               <div className="card-body">
+
                 <div className="d-flex justify-content-between align-items-center">
+
                   <div>
                     <p className="text-muted mb-1">
                       Departments
@@ -402,16 +455,21 @@ function App() {
                   >
                     🏢
                   </div>
+
                 </div>
+
               </div>
             </div>
           </div>
 
           {/* AVERAGE SALARY */}
+
           <div className="col-md-6 col-lg-3">
             <div className="card border-0 shadow h-100">
               <div className="card-body">
+
                 <div className="d-flex justify-content-between align-items-center">
+
                   <div>
                     <p className="text-muted mb-1">
                       Average Salary
@@ -435,16 +493,21 @@ function App() {
                   >
                     💰
                   </div>
+
                 </div>
+
               </div>
             </div>
           </div>
 
           {/* HIGHEST SALARY */}
+
           <div className="col-md-6 col-lg-3">
             <div className="card border-0 shadow h-100">
               <div className="card-body">
+
                 <div className="d-flex justify-content-between align-items-center">
+
                   <div>
                     <p className="text-muted mb-1">
                       Highest Salary
@@ -468,13 +531,19 @@ function App() {
                   >
                     💵
                   </div>
+
                 </div>
+
               </div>
             </div>
           </div>
+
         </div>
 
-        {/* ADD / EDIT FORM */}
+        {/* =========================
+            ADD / EDIT FORM
+        ========================= */}
+
         <div className="card shadow border-0 mb-5">
 
           <div
@@ -498,7 +567,9 @@ function App() {
               <div className="row g-3">
 
                 {/* NAME */}
+
                 <div className="col-md-6">
+
                   <label className="form-label fw-semibold">
                     Name
                   </label>
@@ -512,10 +583,13 @@ function App() {
                     onChange={handleChange}
                     required
                   />
+
                 </div>
 
                 {/* EMAIL */}
+
                 <div className="col-md-6">
+
                   <label className="form-label fw-semibold">
                     Email
                   </label>
@@ -529,10 +603,13 @@ function App() {
                     onChange={handleChange}
                     required
                   />
+
                 </div>
 
                 {/* DEPARTMENT */}
+
                 <div className="col-md-6">
+
                   <label className="form-label fw-semibold">
                     Department
                   </label>
@@ -546,10 +623,13 @@ function App() {
                     onChange={handleChange}
                     required
                   />
+
                 </div>
 
                 {/* SALARY */}
+
                 <div className="col-md-6">
+
                   <label className="form-label fw-semibold">
                     Salary
                   </label>
@@ -563,10 +643,13 @@ function App() {
                     onChange={handleChange}
                     required
                   />
+
                 </div>
+
               </div>
 
               {/* BUTTONS */}
+
               <div className="mt-4 d-flex gap-2">
 
                 <button
@@ -591,12 +674,18 @@ function App() {
                     ❌ Cancel
                   </button>
                 )}
+
               </div>
+
             </form>
+
           </div>
         </div>
 
-        {/* EMPLOYEE LIST */}
+        {/* =========================
+            EMPLOYEE LIST
+        ========================= */}
+
         <div className="card shadow border-0">
 
           <div className="card-header bg-dark text-white d-flex justify-content-between align-items-center">
@@ -614,9 +703,11 @@ function App() {
           <div className="card-body">
 
             {/* SEARCH + FILTER */}
+
             <div className="row g-3 mb-4">
 
               <div className="col-md-7">
+
                 <label className="form-label fw-semibold">
                   🔍 Search Employee
                 </label>
@@ -630,9 +721,11 @@ function App() {
                     setSearch(e.target.value)
                   }
                 />
+
               </div>
 
               <div className="col-md-5">
+
                 <label className="form-label fw-semibold">
                   🏢 Filter by Department
                 </label>
@@ -646,24 +739,32 @@ function App() {
                     )
                   }
                 >
+
                   <option value="">
                     All Departments
                   </option>
 
-                  {departments.map((department) => (
-                    <option
-                      key={department}
-                      value={department}
-                    >
-                      {department}
-                    </option>
-                  ))}
+                  {departments.map(
+                    (department) => (
+                      <option
+                        key={department}
+                        value={department}
+                      >
+                        {department}
+                      </option>
+                    )
+                  )}
+
                 </select>
+
               </div>
+
             </div>
 
             {/* CLEAR FILTER */}
-            {(search || departmentFilter) && (
+
+            {(search ||
+              departmentFilter) && (
               <button
                 className="btn btn-outline-secondary btn-sm mb-4"
                 onClick={clearFilters}
@@ -673,6 +774,7 @@ function App() {
             )}
 
             {/* LOADING */}
+
             {loading && (
               <div className="text-center py-4">
 
@@ -684,10 +786,12 @@ function App() {
                 <p className="mt-2 text-muted">
                   Loading employees...
                 </p>
+
               </div>
             )}
 
             {/* NO EMPLOYEES */}
+
             {!loading &&
               !error &&
               employees.length === 0 && (
@@ -705,9 +809,11 @@ function App() {
               )}
 
             {/* NO SEARCH RESULT */}
+
             {!loading &&
               employees.length > 0 &&
-              filteredEmployees.length === 0 && (
+              filteredEmployees.length ===
+                0 && (
                 <div className="text-center py-5">
 
                   <h5 className="text-muted">
@@ -725,6 +831,7 @@ function App() {
               )}
 
             {/* TABLE */}
+
             {!loading &&
               filteredEmployees.length > 0 && (
                 <div className="table-responsive">
@@ -746,65 +853,74 @@ function App() {
 
                     <tbody>
 
-                      {filteredEmployees.map((emp) => (
+                      {filteredEmployees.map(
+                        (emp) => (
 
-                        <tr key={emp.id}>
+                          <tr key={emp.id}>
 
-                          <td className="fw-bold">
-                            #{emp.id}
-                          </td>
+                            <td className="fw-bold">
+                              #{emp.id}
+                            </td>
 
-                          <td>
-                            <strong>
-                              {emp.name}
-                            </strong>
-                          </td>
+                            <td>
+                              <strong>
+                                {emp.name}
+                              </strong>
+                            </td>
 
-                          <td>
-                            {emp.email}
-                          </td>
+                            <td>
+                              {emp.email}
+                            </td>
 
-                          <td>
-                            <span className="badge bg-secondary">
-                              {emp.department}
-                            </span>
-                          </td>
+                            <td>
+                              <span className="badge bg-secondary">
+                                {emp.department}
+                              </span>
+                            </td>
 
-                          <td className="fw-semibold">
-                            ₹
-                            {Number(
-                              emp.salary
-                            ).toLocaleString("en-IN")}
-                          </td>
+                            <td className="fw-semibold">
+                              ₹
+                              {Number(
+                                emp.salary
+                              ).toLocaleString(
+                                "en-IN"
+                              )}
+                            </td>
 
-                          <td>
+                            <td>
 
-                            <div className="d-flex gap-2">
+                              <div className="d-flex gap-2">
 
-                              <button
-                                className="btn btn-sm btn-warning"
-                                onClick={() =>
-                                  handleEdit(emp)
-                                }
-                              >
-                                ✏️ Edit
-                              </button>
+                                <button
+                                  className="btn btn-sm btn-warning"
+                                  onClick={() =>
+                                    handleEdit(
+                                      emp
+                                    )
+                                  }
+                                >
+                                  ✏️ Edit
+                                </button>
 
-                              <button
-                                className="btn btn-sm btn-danger"
-                                onClick={() =>
-                                  handleDelete(emp.id)
-                                }
-                              >
-                                🗑️ Delete
-                              </button>
+                                <button
+                                  className="btn btn-sm btn-danger"
+                                  onClick={() =>
+                                    handleDelete(
+                                      emp.id
+                                    )
+                                  }
+                                >
+                                  🗑️ Delete
+                                </button>
 
-                            </div>
+                              </div>
 
-                          </td>
+                            </td>
 
-                        </tr>
-                      ))}
+                          </tr>
+
+                        )
+                      )}
 
                     </tbody>
 
@@ -812,16 +928,23 @@ function App() {
 
                 </div>
               )}
+
           </div>
         </div>
+
       </div>
 
       {/* FOOTER */}
+
       <footer className="bg-dark text-white text-center py-3 mt-5">
+
         <small>
-          Employee Management System | React + Spring Boot + MySQL
+          Employee Management System |
+          React + Spring Boot + MySQL
         </small>
+
       </footer>
+
     </div>
   );
 }
