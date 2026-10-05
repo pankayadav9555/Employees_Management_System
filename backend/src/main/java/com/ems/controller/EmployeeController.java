@@ -18,7 +18,13 @@ import com.ems.service.EmployeeService;
 
 @RestController
 @RequestMapping("/api/employees")
-@CrossOrigin(origins = "http://localhost:5174")
+@CrossOrigin(
+        origins = {
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "https://employees-management-system-fronten-ecru.vercel.app"
+        }
+)
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -27,23 +33,37 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
+    // =========================
+    // CREATE EMPLOYEE
+    // =========================
     @PostMapping
     public Employee createEmployee(@RequestBody Employee employee) {
         return employeeService.createEmployee(employee);
     }
 
+    // =========================
+    // GET ALL EMPLOYEES
+    // =========================
     @GetMapping
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
+    // =========================
+    // GET EMPLOYEE BY ID
+    // =========================
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+    public ResponseEntity<Employee> getEmployeeById(
+            @PathVariable Long id) {
+
         return employeeService.getEmployeeById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // =========================
+    // UPDATE EMPLOYEE
+    // =========================
     @PutMapping("/{id}")
     public Employee updateEmployee(
             @PathVariable Long id,
@@ -52,8 +72,12 @@ public class EmployeeController {
         return employeeService.updateEmployee(id, employee);
     }
 
+    // =========================
+    // DELETE EMPLOYEE
+    // =========================
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteEmployee(
+            @PathVariable Long id) {
 
         employeeService.deleteEmployee(id);
 
